@@ -1,0 +1,17 @@
+[Unit]
+Description=ObcyAstronom service
+After=multi-user.target
+
+[Service]
+Type=idle
+# MUST SET YOUR USERNAME HERE.
+User=pi
+ExecStartPre=echo 18 > /sys/class/gpio/export
+ExecStart=sudo ./home/pi/astronom/obcyastronom
+
+
+Restart=no
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
