@@ -18,7 +18,7 @@ void settingsRead(){
 		infile = fopen (filename, "r");
 
     } 
-
+    int n,s = 0;
     int r = fscanf(infile, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
                     &fsettings.camera_autorun,
 	                &fsettings.camera_shooter_count,
@@ -48,8 +48,8 @@ void settingsRead(){
                     &fsettings.compas_mdec_cor_deg,
                     &fsettings.compas_mdec_cor_mins,
                     &fsettings.compas_azimuth_cor,
-                    &fsettings.network_type,
-                    &fsettings.server_type
+                    &n,
+                    &s
             );
 	if(r>-1) printf("contents readeen successfully !\n"); else printf("error reading form file !\n");
     // close file 

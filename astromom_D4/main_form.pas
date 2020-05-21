@@ -461,7 +461,7 @@ begin
      if application.MessageBox('Do you realy want to switch server type?', 'Switch server type', MB_YESNO)=ID_NO then exit;
      if radio_connected.enableblinking then
         begin
-             buffer[0]:= '&';
+             buffer[0]:= '=';
              udp.SendBuffer(buffer, 10);
              sleep(1000);
         end;
@@ -474,7 +474,7 @@ begin
      if application.MessageBox('Do you realy want to switch network mode?', 'Switch network mode', MB_YESNO)=ID_NO then exit;
      if radio_connected.enableblinking then
         begin
-             buffer[0]:= '&';buffer[1]:= '&';
+             buffer[0]:= '+';
              udp.SendBuffer(buffer, 10);
              sleep(1000);
         end;

@@ -51,19 +51,11 @@ void* udpserverThread(void* args)
 
      n = recvfrom(sockfd, (char *)buffer, MAXLINE , MSG_DONTWAIT, ( struct sockaddr *) &cliaddr, &len);
 		if(n>0){
-			
-			if((buffer[0]=='$')&&(buffer[2]=='$')){			//zdalne sterowanie ostroscia
-					if(buffer[1]=='S') pwmWrite(18,0);
-					if(buffer[1]=='L') pwmWrite(18,134);
-					if(buffer[1]=='R') pwmWrite(18,144);
-					if(DEBUG)printf("%c", buffer[1]);		
-			} else {
 				while(serial_busy)usleep(timeOut*100);
 					for(int i = 0; i<n;i++){
 						serialPutchar(serial_port, buffer[i]);
 						if(DEBUG)printf("%c", buffer[i]);	
 					}
-			}
 			if(DEBUG)printf("\n", ' ');
 			ignore = 1;
 		} 

@@ -30,7 +30,10 @@ char program_path[255];
 int DEBUG = 1;
 
 int isINDY(){
-	return system("systemctl is-active indi");
+	int ret = system("systemctl is-active indi");
+	printf("isindi: %i", ret); 
+	fflush( stdout );
+	if(ret==0)fsettings.server_type = SERVER_TYPE_INDY; else fsettings.server_type = SERVER_TYPE_UDP2SER; 
 } 
 
 int main( int argc, char *argv[], char *envp[] ) {
@@ -51,21 +54,21 @@ int main( int argc, char *argv[], char *envp[] ) {
    	pwmSetMode (PWM_MODE_MS);
    	pwmSetRange (2000);
    	pwmSetClock (195);
+	settingsRead();
 
 	displayInit();
-	settingsRead();
 	networkInit();
-	
-	//if(isINDY()!=768)fsettings.server_type = SERVER_TYPE_INDY; else fsettings.server_type = SERVER_TYPE_UDP2SER;
-	displayMenu(MENU_INFO);
-
 	compas_init();
-	
+	isINDY();
+	displayMenu(MENU_INFO);
 	int thread_display=pthread_create(&id_display,NULL,&displayThread,NULL);
-	int thread_udpserver=pthread_create(&id_udp2ser,NULL,&udpserverThread,NULL);
-	int thread_udpserver2=pthread_create(&id_udp2ser2,NULL,&udpserver2Thread,NULL);
+	
+	if(fsettings.server_type == SERVER_TYPE_UDP2SER){
+		int thread_udpserver=pthread_create(&id_udp2ser,NULL,&udpserverThread,NULL);
+		camera_init();
+	}
 
-	camera_init();
+	int thread_udpserver2=pthread_create(&id_udp2ser2,NULL,&udpserver2Thread,NULL);
 	joystick_init();
 
 	for(;;){

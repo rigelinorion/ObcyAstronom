@@ -6,6 +6,7 @@
 uint8_t speed = 9;
 uint8_t JConnected = 0;
 extern _Bool recording_now;
+extern struct tsettings fsettings;
 
 int joy_fd, *axis=NULL, num_of_axis=0, num_of_buttons=0, x;
 char *button=NULL, name_of_joystick[80];
@@ -87,6 +88,7 @@ int joystick_getJStateEx(int *faxis, char *fbuttons){
 }
 
 void joystick_sendCommand(char cmd[16]){
+		if(fsettings.server_type != SERVER_TYPE_UDP2SER) return;
 		serial_busy=1;
 		char cmd_stop[] = ":K1:\r:K2:\r";
 		for(int i = 0; i<8;i++){
@@ -227,11 +229,11 @@ void joystick_keyEvent(){
 						break;
 					//(left arm fire button)
 					case KEY_BTN_11:
-						camera_raspistill_takepicture();
+						if(fsettings.server_type == SERVER_TYPE_UDP2SER)camera_raspistill_takepicture();
 						break;
 					//(right arm fire button)
 					case KEY_BTN_12:
-						if(recording_now) camera_destroyPreview(); else camera_startRecord();
+						if(fsettings.server_type == SERVER_TYPE_UDP2SER)if(recording_now) camera_destroyPreview(); else camera_startRecord();
 					break;
 				}
 				last_command=key;

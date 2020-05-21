@@ -121,6 +121,7 @@ void displayMenu(int index){
 	//char buf[255];
 	//sprintf(buf, "menindex: %i", index);
 	//puts(buf);
+	if((fsettings.server_type!=SERVER_TYPE_UDP2SER)&&(index>7)) return;
 	switch(index){
 		case MENU_BLACK:
 			OLED_Clear(BLACK);
@@ -128,11 +129,11 @@ void displayMenu(int index){
 		case MENU_INFO:
 			OLED_Clear(BLACK);
 			GUI_DrawRectangle(1,1,128,64,WHITE, DRAW_EMPTY, DOT_FILL_RIGHTUP);
-			if(!fsettings.server_type) 
+			if(fsettings.server_type==SERVER_TYPE_INDY) 
 				GUI_DisString_EN(6, 10, "server type: INDI", &Font12, FONT_BACKGROUND, WHITE); 
 			else 
 				GUI_DisString_EN(8, 10, "server type: U2S", &Font12, FONT_BACKGROUND, WHITE);
-			if(fsettings.network_type) 
+			if(fsettings.network_type==NETWORK_TYPE_LOCAL) 
 				GUI_DisString_EN(10, 27, "wifi mode: LOCAL", &Font12, FONT_BACKGROUND, WHITE); 
 			else 
 				GUI_DisString_EN(19, 27, "wifi mode: AP", &Font12, FONT_BACKGROUND, WHITE);
@@ -156,7 +157,7 @@ void displayMenu(int index){
 			displayDraw2Options( "Local network", "Acces point",fsettings.network_type, "WiFi mode", "< >");
 		break;
 		case MENU_SERVER:
-			displayDraw2Options("Udp2Ser server", "INDI server", fsettings.server_type, "Server type", "< >");
+			displayDraw2Options("INDI server", "Udp2Ser server", fsettings.server_type, "Server type", "< >");
 		break;
 
 		case MENU_CAMERA_ENABLED:

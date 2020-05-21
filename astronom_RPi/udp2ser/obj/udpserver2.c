@@ -55,10 +55,16 @@ void* udpserver2Thread(void* args)
 	 for(int i = 0; i<10;i++)buffer[i]=0;	
      n = recvfrom(sockfd2, (char *)buffer, MAXLINE , 0, ( struct sockaddr2 *) &cliaddr2, &len);
 		if(n>0){
+			if(buffer[0]=='s'){			//zdalne sterowanie ostroscia
+				if(buffer[1]=='S') pwmWrite(18,0);
+				if(buffer[1]=='L') pwmWrite(18,134);
+				if(buffer[1]=='R') pwmWrite(18,144);
+				if(DEBUG)printf("%c", buffer[1]);		
+			}
 			if(buffer[0]=='m'){ // record
-			char msg[255];
-			sscanf(buffer, "m %s", msg);
-			displayMessage(msg);
+				char msg[255];
+				sscanf(buffer, "m %s", msg);
+				displayMessage(msg);
 			}
 			if(buffer[0]==':'){ // record
 				if(recording_now) camera_destroyPreview(); else camera_startRecord();
@@ -95,14 +101,18 @@ void* udpserver2Thread(void* args)
 			if(buffer[0]=='@'){ //update display
 				camera_restartPreview();
 			}
-			if(buffer[0]=='&'){ // # switch server type, ## switch network type
-				if(buffer[1]=='&'){
-					fsettings.server_type = !fsettings.server_type;
-					_system_sh("switchToINDIMode.sh");
+			if(buffer[0]=='+'){ // = switch network type 
+				//if(fsettings.network_type == NETWORK_TYPE_AP)fsettings.network_type = NETWORK_TYPE_LOCAL; else fsettings.network_type = NETWORK_TYPE_AP;
+				_system_sh("switchNetworkMode.sh");
+			} 
+			if(buffer[0]=='='){ // = switch server type 
+				if(fsettings.server_type == SERVER_TYPE_INDY){
+					fsettings.server_type = SERVER_TYPE_UDP2SER;
+					_system_sh("astronommode.sh");
 				} else {
-					fsettings.network_type = !fsettings.network_type;
-					_system_sh("switchNetworkMode.sh");
-				}
+					fsettings.server_type = SERVER_TYPE_INDY;
+					_system_sh("indimode.sh"); 
+				} 	
 			}
 
 			if((buffer[0]=='#')){	 // recived #-get $-settings
@@ -111,8 +121,8 @@ void* udpserver2Thread(void* args)
 				//printf("request setting %s\n",buffer); 
 				sscanf(buffer, "# %d", &param);
 				switch (param){
-					case MENU_NETWORK					:sprintf(outbuffer, "# %d %d", MENU_NETWORK, fsettings.server_type); break;
-					case MENU_SERVER					:sprintf(outbuffer, "# %d %d", MENU_SERVER, fsettings.network_type);	break;
+					case MENU_NETWORK					:sprintf(outbuffer, "# %d %d", MENU_NETWORK, fsettings.network_type); break;
+					case MENU_SERVER					:sprintf(outbuffer, "# %d %d", MENU_SERVER, fsettings.server_type);	break;
 					case MENU_CAMERA_ENABLED			:sprintf(outbuffer, "# %d %d", MENU_CAMERA_ENABLED, fsettings.camera_autorun); break;
 					case MENU_CAMERA_SHOOT_COUNT		:sprintf(outbuffer, "# %d %d", MENU_CAMERA_SHOOT_COUNT, fsettings.camera_shooter_count); break;
 					case MENU_CAMERA_SHOOT_DELAY		:sprintf(outbuffer, "# %d %d", MENU_CAMERA_SHOOT_DELAY, fsettings.camera_shooter_delay); break;

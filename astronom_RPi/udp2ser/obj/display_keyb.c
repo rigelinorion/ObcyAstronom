@@ -56,6 +56,7 @@ void key_event(void)
         if(KEY_DOWN_RD == 0) {
             while(KEY_DOWN_RD == 0)DEV_Delay_ms(10);
             if(menu_index<MENU_COUNT)menu_index++;
+			if((fsettings.server_type == SERVER_TYPE_INDY)&&(menu_index>7))menu_index=7;
             displayMenu(menu_index);
             idle_subcounter=0;
         }
@@ -63,7 +64,7 @@ void key_event(void)
             while(KEY_LEFT_RD == 0)DEV_Delay_ms(10);
             switch(menu_index){
 				case MENU_SERVER:
-            		fsettings.server_type = 0;
+            		if(fsettings.server_type == SERVER_TYPE_INDY) fsettings.server_type = SERVER_TYPE_UDP2SER; else fsettings.server_type = SERVER_TYPE_INDY;
             	break;
             	case MENU_NETWORK:
             		fsettings.network_type = 0;
@@ -163,7 +164,7 @@ void key_event(void)
             while(KEY_LEFT_RD == 0)DEV_Delay_ms(10);
             switch(menu_index){
             	case MENU_SERVER:
-            		fsettings.server_type = 1;
+            		if(fsettings.server_type == SERVER_TYPE_INDY) fsettings.server_type = SERVER_TYPE_UDP2SER; else fsettings.server_type = SERVER_TYPE_INDY;
             	break;
             	case MENU_NETWORK:
             		fsettings.network_type = 1;
@@ -272,7 +273,11 @@ void key_event(void)
 				switch(menu_index){
 					case MENU_SERVER:
             			displayMessage("Switching server type");
-            			if(fsettings.server_type) _system_sh("astronommode.sh"); else _system_sh("indimode.sh");
+            			if(fsettings.server_type==SERVER_TYPE_UDP2SER){
+							_system_sh("astronommode.sh");
+						}  else {
+							_system_sh("indimode.sh");
+						}
             		break;
             	case MENU_NETWORK:
             			displayMessage("Switching network type");
