@@ -175,11 +175,13 @@ void* camera_previewThread(void* args)
 					);
 				system(cmdline);
 			} else {
-                printf("display camera view by video server");
+                //printf("display camera view by video server");
 				_system_sh("run_video_stream.sh");
-				//system("raspivid -o - -t 0 -hf -w 800 -h 400 -fps 24 |cvlc -vvv stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8554}' :demux=h264");
-				//system("raspivid -o - -t 0 -n | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:3333/}' :demux=MJPG");
-				//system("raspivid -l -o #rtp://0.0.0.0:3333");
+				//system("sudo raspivid -o - -t 0 -hf -w 800 -h 400 -fps 24 |cvlc -vvv stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8554}' :demux=h264");
+				///system("raspivid -o - -t 0 -n | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:3333/}' :demux=MJPG");
+				//system("raspivid -l -o - #rtp://0.0.0.0:3333");
+				//raspivid -o - -t 0 -b 1000000 -w 320 -h 240 | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8554/stream}' :demux=h264
+
 			}
 		} else {
             printf("no camera fount");

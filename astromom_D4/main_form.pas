@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ComCtrls, ToolWin, NMUDP, Spin, ExtCtrls, Buttons, scanf,
   OleCtrls, NMHTML, Psock, NMHttp, NMSTRM, VrControls, VrWheel, VrBlinkLed,
-  VrCompass;
+  VrCompass, WMPLib_TLB;
 
 type
   TForm1 = class(TForm)
@@ -111,6 +111,7 @@ type
     Image1: TImage;
     btn_zerotelescope: TSpeedButton;
     label_level: TLabel;
+    WindowsMediaPlayer1: TWindowsMediaPlayer;
     procedure udpDataReceived(Sender: TComponent; NumberBytes: Integer;
       FromIP: String);
     procedure combo_ipChange(Sender: TObject);
