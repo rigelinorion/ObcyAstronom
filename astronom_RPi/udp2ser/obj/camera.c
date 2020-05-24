@@ -35,7 +35,10 @@ void camera_raspistill_takepicture(){
 
 	char picture_folder[255];
 	char picture_filename[255];
+	char info_filename[255];
 	char cmdline[255];
+	char info[1024];
+	FILE *outfile;
 
 	time_t tt = time(NULL);
   	struct tm tm = *localtime(&tt);
@@ -75,6 +78,24 @@ void camera_raspistill_takepicture(){
 					picture_filename
 					);
 	puts(cmdline);
+	
+	sprintf(info_filename, "%s%s", picture_filename, ".info");
+    outfile = fopen (info_filename, "w");
+	fprintf(outfile, "brigthness: %i\n contrast: %i\n whitebalance: %s\n exposure: %s\n ISO %i\n width: %i\n height: %i\n encoding: %s\n quality: %i\n metering: %s\n shutterspeed: %i\n rotate: %i",
+					fsettings.camera_brigthness,
+					fsettings.camera_contrast,
+					_raspicmd_awb[fsettings.camera_awb],
+					_raspicmd_exposure[fsettings.camera_exposure],
+					fsettings.camera_ISO,
+					fsettings.camera_image_size*BASE_WIDTH,
+					fsettings.camera_image_size*BASE_HEIGHT,
+					_raspicmd_image_codec[fsettings.camera_image_codec],
+					fsettings.camera_image_quality,
+					_raspicmd_metering[fsettings.camera_metering],
+					fsettings.camera_ss*1000,
+					fsettings.camera_rot
+					);
+	fclose (outfile);
 
 	camera_destroyPreview();
 	system(cmdline);
@@ -88,7 +109,10 @@ void* camera_recordVideo(void* args){
 
 	char picture_folder[255];
 	char picture_filename[255];
+	char info_filename[255];
 	char cmdline[255];
+	char info[1024];
+	FILE *outfile;
 
 	time_t tt = time(NULL);
   	struct tm tm = *localtime(&tt);
@@ -132,6 +156,23 @@ void* camera_recordVideo(void* args){
 					picture_filename
 					);
 	puts(cmdline);
+	sprintf(info_filename, "%s%s", picture_filename, ".info");
+    outfile = fopen (info_filename, "w");
+	fprintf(outfile, "brigthness: %i\n contrast: %i\n whitebalance: %s\n exposure: %s\n metering: %s\n ISO %i\n width: %i\n height: %i\n codec: %s\n bitrate: %i\n frame per sec: %i\n rotate: %i",
+					fsettings.camera_brigthness,
+					fsettings.camera_contrast,
+					_raspicmd_awb[fsettings.camera_awb],
+					_raspicmd_exposure[fsettings.camera_exposure],
+					_raspicmd_metering[fsettings.camera_metering],
+					fsettings.camera_ISO,
+					fsettings.camera_video_size*BASE_WIDTH,
+					fsettings.camera_video_size*BASE_HEIGHT,
+					_raspicmd_video_codec[fsettings.camera_video_codec],
+					fsettings.camera_video_quality*1000000,
+					fsettings.camera_video_fps,
+					fsettings.camera_rot
+					);
+	fclose (outfile);
 	camera_destroyPreview();
 	sleep(2);
 	recording_now = TRUE;
@@ -158,8 +199,8 @@ void camera_restartPreview(){
 void* camera_previewThread(void* args)
 {
 		if( access( "/dev/video0", F_OK ) != -1 ){
+			char cmdline[255];
 			if(fsettings.camera_preview_on==CAMERA_ON_HDMI){
-				char cmdline[255];
 				sprintf(cmdline, "raspistill");
 				if(fsettings.camera_vf)sprintf(cmdline, "%s -vf", cmdline);
 				if(fsettings.camera_hf)sprintf(cmdline, "%s -hf", cmdline);
@@ -175,13 +216,20 @@ void* camera_previewThread(void* args)
 					);
 				system(cmdline);
 			} else {
-                //printf("display camera view by video server");
-				_system_sh("run_video_stream.sh");
-				//system("sudo raspivid -o - -t 0 -hf -w 800 -h 400 -fps 24 |cvlc -vvv stream:///dev/stdin --sout '#standard{access=http,mux=ts,dst=:8554}' :demux=h264");
-				///system("raspivid -o - -t 0 -n | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:3333/}' :demux=MJPG");
-				//system("raspivid -l -o - #rtp://0.0.0.0:3333");
-				//raspivid -o - -t 0 -b 1000000 -w 320 -h 240 | cvlc -vvv stream:///dev/stdin --sout '#rtp{sdp=rtsp://:8554/stream}' :demux=h264
-
+				sprintf(cmdline, "video_stream.py");
+				if(fsettings.camera_vf)sprintf(cmdline, "%s -vf", cmdline);
+				if(fsettings.camera_hf)sprintf(cmdline, "%s -hf", cmdline);
+				if(fsettings.camera_rot>0)sprintf(cmdline, "%s -rot %i", cmdline, fsettings.camera_rot);
+				sprintf(cmdline, "%s -t 0 -p %s -awb %s -ex %s -br %i -co %i -ISO %i", 
+					cmdline,
+					_raspicmd_preview_sizes[fsettings.camera_preview_size],
+					_raspicmd_awb[fsettings.camera_awb],
+					_raspicmd_exposure[fsettings.camera_exposure],
+					fsettings.camera_brigthness,
+					fsettings.camera_contrast-100,
+					fsettings.camera_ISO
+					);
+				_system_py(cmdline);
 			}
 		} else {
             printf("no camera fount");

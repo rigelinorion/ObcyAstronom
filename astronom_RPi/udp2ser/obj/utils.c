@@ -23,3 +23,8 @@ void _system_suh(char* cmdline){
     sprintf(buffer, "sudo %s%s", program_path, cmdline);
     system(buffer);
 }
+void _system_py(char* cmdline){
+    char buffer[255];
+    sprintf(buffer, "sudo python3 %s%s", program_path, cmdline);
+    system(buffer);
+}

@@ -11,12 +11,8 @@ from http import server
 
 PAGE="""\
 <html>
-<head>
-<title>ObcyAstronom</title>
-</head>
 <body>
-<center><h1>PI zero Astronom</h1></center>
-<center><img src="stream.mjpg" width="1024" height="768"></center>
+<center><img src="stream.mjpg" width="800" height="600"></center>
 </body>
 </html>
 """
@@ -81,7 +77,9 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-with picamera.PiCamera(resolution='1024x768', framerate=24) as camera:
+
+
+with picamera.PiCamera(resolution='800x600', framerate=24) as camera:
     output = StreamingOutput()
     #Uncomment the next line to change your Pi's Camera rotation (in degrees)
     #camera.rotation = 90

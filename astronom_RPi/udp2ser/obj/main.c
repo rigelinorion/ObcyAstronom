@@ -27,7 +27,7 @@ int indi_status = 768;
 pthread_t id_display, id_udp2ser,  id_udp2ser2,id_camera;
 char program_path[255];
 
-int DEBUG = 1;
+int DEBUG = 0;
 
 int isINDY(){
 	int ret = system("systemctl is-active indi");
