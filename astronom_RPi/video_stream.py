@@ -8,6 +8,25 @@ import logging
 import socketserver
 from threading import Condition
 from http import server
+import threading
+import time
+import socket
+# import libc
+from ctypes import cdll
+libc = cdll.LoadLibrary("libc.so.6")
+sscanf = libc.sscanf
+#libc = CDLL("libc.so.6")  # alternative
+
+# allocate vars
+#i = c_int()
+#f = c_float()
+#s = create_string_buffer(b'\000' * 32)
+# parse with sscanf
+#libc.sscanf(b"1 3.14 Hello", "%d %f %s", byref(i), byref(f), s)
+# read the parsed values
+#i.value  # 1
+#f.value  # 3.14
+#s.value # b'Hello'
 
 PAGE="""\
 <html>
@@ -78,15 +97,38 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     daemon_threads = True
 
 
+def previev():
+    with picamera.PiCamera(resolution='800x600', framerate=24) as camera:
+        output = StreamingOutput()
+        #Uncomment the next line to change your Pi's Camera rotation (in degrees)
+        #camera.rotation = 90
+        camera.start_recording(output, format='mjpeg')
+        try:
+            address = ('', 8000)
+            server = StreamingServer(address, StreamingHandler)
+            server.serve_forever()
+        finally:
+            camera.stop_recording()
 
-with picamera.PiCamera(resolution='800x600', framerate=24) as camera:
-    output = StreamingOutput()
-    #Uncomment the next line to change your Pi's Camera rotation (in degrees)
-    #camera.rotation = 90
-    camera.start_recording(output, format='mjpeg')
-    try:
-        address = ('', 8000)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-    finally:
-        camera.stop_recording()
+
+def onmessage(msg):
+    if char(msg[0]) == "P":
+        global tpreview
+        tpreview = threading.Thread(target=previev).start()
+    if char(msg[0]) == "p":
+        tpreview.kill()
+
+UDP_IP_ADDRESS = "127.0.0.1"
+UDP_PORT_NO = 11111
+tpreview = 0
+
+def main():
+    serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)   
+    serverSock.bind((UDP_IP_ADDRESS, UDP_PORT_NO))
+    while True:
+        data, addr = serverSock.recvfrom(1024)
+        print ("Message: ", data)
+        onmessage(data)
+
+if __name__ == '__main__':
+    main()
