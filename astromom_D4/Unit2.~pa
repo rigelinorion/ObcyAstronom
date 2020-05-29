@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls;
+  ExtCtrls, JLCVideo;
 
 type
   TForm2 = class(TForm)
+    JLCVideo1: TJLCVideo;
   private
     { Private declarations }
   public

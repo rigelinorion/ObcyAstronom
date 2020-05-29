@@ -111,7 +111,6 @@ type
     Image1: TImage;
     btn_zerotelescope: TSpeedButton;
     label_level: TLabel;
-    WindowsMediaPlayer1: TWindowsMediaPlayer;
     procedure udpDataReceived(Sender: TComponent; NumberBytes: Integer;
       FromIP: String);
     procedure combo_ipChange(Sender: TObject);
